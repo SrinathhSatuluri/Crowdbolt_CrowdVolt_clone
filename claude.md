@@ -2,239 +2,250 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 📂 Project Structure (Monorepo)
+## 🏗️ **CrowdBolt Architecture Overview**
+
+**Project Type:** Event ticket resale marketplace (StockX model for events/raves)
+**Architecture:** Monorepo with microservice-ready Django apps + Next.js frontend
+
+### **Current Tech Stack**
+- **Frontend:** Next.js 15 + TypeScript + TailwindCSS + Redux Toolkit
+- **Backend:** Django 5.2 + DRF + PostgreSQL + JWT Authentication
+- **Infrastructure:** Docker Compose + Redis (planned)
+- **Authentication:** JWT with refresh tokens, role-based access control
+
+## 🛠️ **Development Commands**
+
+### **Start Development Environment**
+```bash
+# Full stack (recommended)
+docker-compose up -d
+
+# Individual services for debugging
+# Frontend only
+cd frontend && npm run dev
+
+# Backend only (activate venv first)
+cd backend && . venv/Scripts/activate && python manage.py runserver
+
+# Database only
+docker-compose up db -d
+```
+
+### **Frontend Commands**
+```bash
+cd frontend
+
+# Development
+npm run dev          # Start with Turbopack
+npm run build        # Production build with Turbopack
+npm start           # Start production server
+npm run lint        # ESLint check
+```
+
+### **Backend Commands**
+```bash
+cd backend && . venv/Scripts/activate
+
+# Development
+python manage.py runserver
+python manage.py runserver 0.0.0.0:8000  # Bind to all interfaces
+
+# Database
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py dbshell
+
+# Utilities
+python manage.py shell
+python manage.py collectstatic
+python manage.py check --deploy  # Production readiness check
+```
+
+### **Docker Commands**
+```bash
+# Build and start all services
+docker-compose up --build
+
+# View logs
+docker-compose logs -f backend
+docker-compose logs -f frontend
+
+# Execute commands in containers
+docker-compose exec backend python manage.py migrate
+docker-compose exec backend python manage.py shell
+
+# Clean up
+docker-compose down
+docker-compose down -v  # Remove volumes too
+```
+
+## 📂 **Project Structure**
 
 ```
 CrowdBolt_stockX_clone/
-├── frontend/                 # Next.js React frontend
+├── frontend/                    # Next.js 15 frontend
 │   ├── src/
-│   │   ├── components/      # Reusable UI components
-│   │   ├── pages/          # Next.js page routes
-│   │   ├── hooks/          # Custom React hooks (RTK Query)
-│   │   ├── store/          # Redux store configuration
-│   │   └── styles/         # TailwindCSS styles
-│   ├── __tests__/          # Jest + RTL tests
-│   └── cypress/            # E2E tests
-├── backend/                 # Django REST API
-│   ├── apps/               # Django apps
-│   │   ├── users/          # User management
-│   │   ├── events/         # Event/ticket listings
-│   │   ├── transactions/   # Payment processing
-│   │   └── reviews/        # User reviews
-│   ├── config/             # Django settings
-│   └── requirements.txt    # Python dependencies
-├── docker-compose.yml       # Multi-service orchestration
-├── .github/                 # CI/CD workflows
-└── docs/                   # Project documentation
+│   │   ├── app/                # App Router pages
+│   │   ├── components/         # React components
+│   │   ├── hooks/              # Custom hooks (Redux typed)
+│   │   ├── providers/          # Context providers
+│   │   ├── store/              # Redux Toolkit store
+│   │   └── types/              # TypeScript definitions
+│   ├── Dockerfile
+│   └── package.json            # Dependencies include auth, forms, validation
+├── backend/                     # Django 5.2 backend
+│   ├── apps/                   # Microservice-style apps
+│   │   ├── users/              # Authentication & user management
+│   │   └── products/           # Event/ticket management
+│   ├── config/                 # Django project settings
+│   │   ├── settings.py         # Environment-based config
+│   │   └── urls.py
+│   ├── requirements.txt        # Includes JWT, rate limiting, Argon2
+│   └── Dockerfile
+├── docker-compose.yml          # Multi-service orchestration
+└── README.md
 ```
 
-### Initial Project Setup
-When setting up this project from scratch:
+## 🔑 **Authentication Architecture**
 
-1. **Frontend Setup:**
-   ```bash
-   npx create-next-app@latest frontend --typescript --tailwind --eslint --app
-   cd frontend && npm install @reduxjs/toolkit react-redux
-   ```
+**Current Implementation:** JWT-based authentication with role-based access control
 
-2. **Backend Setup:**
-   ```bash
-   mkdir backend && cd backend
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   pip install django djangorestframework django-cors-headers
-   django-admin startproject config .
-   ```
+### **Backend (Django)**
+- Custom User model with roles (buyer/seller/admin)
+- JWT tokens with short expiration + refresh mechanism
+- Rate limiting on auth endpoints
+- Argon2 password hashing
+- Email verification system (planned)
 
-3. **Database Setup:**
-   ```bash
-   # PostgreSQL configuration in Django settings
-   # Run migrations after model creation
-   python manage.py migrate
-   ```
+### **Frontend (Next.js)**
+- Redux auth slice with RTK Query
+- Typed hooks for auth state management
+- Protected route components
+- Form validation with react-hook-form + zod
 
----
+## 🗄️ **Database Schema**
 
-## ⚙️ Tech Stack
+**Database:** PostgreSQL (configured, using SQLite in development)
 
-- **Frontend:** Next.js (React, TypeScript, TailwindCSS)
-- **Backend:** Django 5.x, Django REST Framework
-- **Database:** PostgreSQL
-- **State Management:** Redux Toolkit + RTK Query
-- **Payments:** Stripe Connect
-- **Testing:** Jest + React Testing Library (frontend), Pytest + DRF test client (backend), Cypress (E2E)
-- **Infra:** Docker + docker-compose, CI/CD via GitHub Actions
-- **Monitoring:** Sentry (frontend & backend), Prometheus + Grafana (infra)
+### **User Model** (apps/users/models.py)
+```python
+# Extended from AbstractUser
+- email (unique, used as username)
+- role (buyer/seller/admin)
+- is_verified (email verification)
+- identity_verified (KYC for fraud prevention)
+- failed_login_attempts (security)
+```
 
----
+## 🔒 **Security Configuration**
 
-## 🛠️ Development Commands
-
-### Frontend (Next.js)
+### **Environment Variables** (.env.example template provided)
 ```bash
-# Development server
-npm run dev
+# Django
+SECRET_KEY=
+DEBUG=
+ALLOWED_HOSTS=
 
-# Build for production
-npm run build
+# Database
+POSTGRES_DB=crowdbolt_db
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_HOST=
 
-# Start production server
-npm start
-
-# Run tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run E2E tests
-npm run cypress:open
-
-# Linting and formatting
-npm run lint
-npm run lint:fix
-npm run format
+# JWT & Auth
+JWT_SECRET_KEY=
+JWT_ACCESS_TOKEN_LIFETIME=15m
+JWT_REFRESH_TOKEN_LIFETIME=7d
 ```
 
-### Backend (Django)
+### **Security Features Implemented**
+- CORS configured for frontend origin
+- Rate limiting middleware
+- Secure JWT configuration
+- Environment-based settings
+- SQL injection protection via ORM
+
+
+## 🚀 **Development Workflow**
+
+### **Branch Strategy**
+- `main` - Production ready code
+- `feature/feature-name` - Feature development
+- `hotfix/issue-description` - Critical fixes
+
+### **Commit Convention**
 ```bash
-# Start development server
-python manage.py runserver
-
-# Database migrations
-python manage.py makemigrations
-python manage.py migrate
-
-# Run tests
-python -m pytest
-python -m pytest apps/specific_app/tests/
-
-# Code quality
-black .
-isort .
-flake8 .
-
-# Create superuser
-python manage.py createsuperuser
-
-# Collect static files
-python manage.py collectstatic
+feat: add user authentication system
+fix: resolve JWT token expiration issue
+docs: update API documentation
 ```
 
-### Docker Development
+## 📝 **API Documentation**
+
+**Backend API Endpoints** (Django REST Framework)
+- Auto-generated OpenAPI docs at `/api/docs/` (when configured)
+- Current base URL: `http://localhost:8000/api/`
+
+**Frontend API Integration**
+- RTK Query for data fetching
+- Typed API hooks in `src/hooks/`
+- Axios configured with interceptors
+
+## 🐳 **Docker Development**
+
+**Services:**
+- `frontend` - Next.js development server (port 3000)
+- `backend` - Django development server (port 8000)
+- `db` - PostgreSQL database (port 5432)
+
+**Volumes:**
+- Source code mounted for live reloading
+- Database persistence with named volume
+
+## 💡 **Key Development Principles**
+
+### **MVP-First Approach**
+- Ship fast, iterate quickly
+- Focus on core features first
+- Use proven patterns and libraries
+- Minimal viable security without over-engineering
+
+### **Code Quality Standards**
+- **Frontend:** TypeScript strict mode, ESLint + Prettier
+- **Backend:** PEP8, Black formatter, isort, flake8
+- **Commits:** Conventional commits (`feat:`, `fix:`, `docs:`)
+
+### **Security Guidelines**
+- Environment variables only (no hardcoded secrets)
+- JWT token security with proper expiration
+- Input validation on all endpoints
+- Rate limiting on authentication endpoints
+
+## 📋 **Common Issues & Solutions**
+
+### **Docker Issues**
 ```bash
-# Start all services
-docker-compose up -d
+# Container port conflicts
+docker-compose down && docker-compose up -d
 
-# View logs
-docker-compose logs -f
+# Database connection issues
+docker-compose exec backend python manage.py dbshell
 
-# Stop services
-docker-compose down
+# Frontend build issues
+docker-compose build --no-cache frontend
+```
 
-# Rebuild services
-docker-compose up --build
+### **Development Setup**
+```bash
+# Backend virtual environment issues
+cd backend && python -m venv venv && . venv/Scripts/activate
+pip install -r requirements.txt
+
+# Node modules issues
+cd frontend && rm -rf node_modules && npm install
 ```
 
 ---
 
-## 🧠 Project Awareness & Context Rules
-
-- **Parallel Execution Rule:** All tasks (frontend, backend, database, tests) must be built in parallel.
-- **Frontend + Backend Concurrency:** Any new feature requires creating UI, API, model, and tests at the same time.
-- **Compliance:** GDPR-ready, WCAG 2.1 AA accessibility.
-- **Security Baseline:** HTTPS only, JWT with refresh rotation, CSRF tokens, SQL injection protection via ORM.
-
----
-
-## 🏗 Code Structure Guidelines
-
-### Frontend
-- Component-based architecture, colocate component + test + styles.
-- Reusable hooks for API calls (RTK Query).
-- Page-level routes under `src/pages`.
-
-### Backend
-- MVC pattern: `routes/ → controllers/ → models/`.
-- DRF serializers for data validation.
-- Explicit service layer for marketplace logic.
-- Split tests per app (`apps/<app>/tests`).
-
-### Database
-- PostgreSQL schema migrations managed via Django migrations.
-- Normalize schema: users, events, tickets, transactions, reviews.
-
----
-
-## 🧪 Testing Requirements
-
-- **Unit Tests:** Components (Jest), Models & Serializers (Pytest).
-- **Integration Tests:** API endpoints (DRF test client), frontend API calls (RTL + Mock Service Worker).
-- **E2E Tests:** Cypress for full user flows (buy/sell ticket).
-- **Performance Tests:** Lighthouse (frontend), Locust (backend).
-
-Testing Pyramid executed **in parallel**:
-- Unit → Integration → E2E → Performance.
-
----
-
-## 🔄 Task Completion Workflow
-
-1. Create GitHub Issue → Assign parallel subtasks:
-   - UI Component
-   - API Route
-   - Database Model/Serializer
-   - Tests (frontend + backend)
-2. Work in feature branch with parallel commits.
-3. PR requires green checks on:
-   - Frontend tests
-   - Backend tests
-   - Integration/E2E tests
-4. Merge after approval + automated build success.
-
----
-
-## 🎨 Style Conventions
-
-- **Frontend:** TypeScript strict mode, ESLint + Prettier, TailwindCSS for styling.
-- **Backend:** PEP8, Black formatter, isort, flake8.
-- **Commits:** Conventional Commits (`feat:`, `fix:`, `test:`, `docs:`).
-- **Docs:** JSDoc for frontend, docstrings for backend.
-
----
-
-## 📚 Documentation Standards
-
-- **README.md:** High-level overview + setup.
-- **claude.md:** Development rules & architecture (this file).
-- **API Docs:** Auto-generated OpenAPI (via DRF + drf-spectacular).
-- **Component Docs:** Storybook for React components.
-- **Runbooks:** Deployment & incident playbooks in `/docs`.
-
----
-
-## 🔒 Sensitive Data Access Rules
-
-Developers must **never access or hardcode** the following directly in source code:
-
-- **API keys**  
-- **Environment variables** (e.g., `.env` values)  
-- **Database credentials**  
-- **Stripe or payment secrets**  
-- **JWT signing keys**  
-- **Any personal user data** not explicitly exposed via APIs  
-
-### ✅ Allowed Practice
-- Always use `process.env.*` (frontend) or `os.environ.get()` (backend) to reference env vars.
-- Store real secrets in **`.env` files** (local only) and use **secret managers** in production.
-- Document new env vars in `.env.example`, not in code.
-
-### 🚫 Not Allowed
-- No hardcoded tokens, passwords, or API keys in commits.  
-- No direct reading/writing to `.env.production` in application code.  
-- No pushing real `.env` files to GitHub.  
-
----
-
-
----
+**Next Steps:** Currently implementing User Authentication microservice with JWT tokens and role-based access control.
