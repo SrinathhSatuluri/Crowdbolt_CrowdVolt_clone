@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import AuthModal from '@/components/AuthModal'
 import { API_ENDPOINTS, apiCall } from '@/lib/api'
+import { mockEvents, mockEventStats } from '@/lib/mockData'
 
 interface EventDetails {
   id: string
@@ -42,8 +43,40 @@ export default function EventDetailsPage() {
 
   useEffect(() => {
     if (params.id) {
-      fetchEventDetails()
-      fetchTicketStats()
+      const useMockData = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true'
+
+      if (useMockData) {
+        // Use mock data for demo
+        const mockEvent = mockEvents.find(e => e.id.toString() === params.id)
+        if (mockEvent) {
+          const transformedEvent = {
+            id: mockEvent.id.toString(),
+            name: mockEvent.title,
+            category: mockEvent.category,
+            venue_name: mockEvent.location,
+            venue_address: `${mockEvent.location} Venue`,
+            city: mockEvent.location.split(',')[0],
+            state: mockEvent.location.split(',')[1]?.trim() || '',
+            event_date: mockEvent.date,
+            doors_open: '7:00 PM',
+            image_url: mockEvent.image_url,
+            artist_lineup: [mockEvent.category],
+            description: mockEvent.description,
+            ticket_count: mockEvent.ticket_count,
+            lowest_price: mockEvent.lowest_price,
+            highest_price: mockEvent.highest_price
+          }
+          setEvent(transformedEvent)
+          setTicketStats(mockEventStats)
+        } else {
+          router.push('/')
+        }
+        setLoading(false)
+      } else {
+        // Use real API calls
+        fetchEventDetails()
+        fetchTicketStats()
+      }
     }
   }, [params.id])
 
