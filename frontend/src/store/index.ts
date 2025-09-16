@@ -1,8 +1,23 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore, createSlice } from '@reduxjs/toolkit'
+import authReducer from './authSlice'
+
+// Simple placeholder slice for now
+const appSlice = createSlice({
+  name: 'app',
+  initialState: {
+    loading: false,
+  },
+  reducers: {
+    setLoading: (state, action) => {
+      state.loading = action.payload
+    },
+  },
+})
 
 export const store = configureStore({
   reducer: {
-    // Add slice reducers here
+    app: appSlice.reducer,
+    auth: authReducer,
   },
 })
 
