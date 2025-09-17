@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import AuthModal from '@/components/AuthModal'
 import { API_ENDPOINTS, apiCall } from '@/lib/api'
-import { mockEvents, mockEventStats } from '@/lib/mockData'
+import { mockEvents } from '@/lib/mockData'
 
 interface EventDetails {
   id: string
@@ -25,12 +25,6 @@ interface EventDetails {
   highest_price: number | null
 }
 
-interface TicketStats {
-  total_tickets: number
-  interested_buyers: number
-  avg_price: number
-  last_sale_price: number | null
-}
 
 export default function EventDetailsPage() {
   const params = useParams()
