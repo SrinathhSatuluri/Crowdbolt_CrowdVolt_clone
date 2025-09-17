@@ -36,61 +36,6 @@ export default function Home() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
 
-  useEffect(() => {
-    const useMockData = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' ||
-                       process.env.NODE_ENV === 'production' // Default to mock data in production
-
-    if (useMockData) {
-      // Use mock data for demo
-      const transformedEvents = mockEvents.map(event => ({
-        id: event.id.toString(),
-        name: event.title,
-        category: event.category,
-        venue_name: event.location,
-        city: event.location.split(',')[0],
-        state: event.location.split(',')[1]?.trim() || '',
-        event_date: event.date,
-        image_url: event.image_url,
-        artist_lineup: [event.category],
-        ticket_count: event.ticket_count,
-        lowest_price: event.lowest_price
-      }))
-
-      setEvents(transformedEvents)
-      setTrendingEvents(transformedEvents.filter((_, index) => index < 3))
-      setLoading(false)
-    } else {
-      // Try real API calls, fallback to mock data on failure
-      fetchEventsWithFallback()
-    }
-  }, [fetchEventsWithFallback])
-
-  const fetchEventsWithFallback = useCallback(async () => {
-    try {
-      await Promise.all([fetchEvents(), fetchTrendingEvents()])
-    } catch (error) {
-      console.error('API calls failed, falling back to mock data:', error)
-      // Fallback to mock data
-      const transformedEvents = mockEvents.map(event => ({
-        id: event.id.toString(),
-        name: event.title,
-        category: event.category,
-        venue_name: event.location,
-        city: event.location.split(',')[0],
-        state: event.location.split(',')[1]?.trim() || '',
-        event_date: event.date,
-        image_url: event.image_url,
-        artist_lineup: [event.category],
-        ticket_count: event.ticket_count,
-        lowest_price: event.lowest_price
-      }))
-
-      setEvents(transformedEvents)
-      setTrendingEvents(transformedEvents.filter((_, index) => index < 3))
-      setLoading(false)
-    }
-  }, [])
-
   const fetchEvents = async () => {
     try {
       const response = await apiCall(API_ENDPOINTS.events)
@@ -122,6 +67,62 @@ export default function Home() {
       throw error
     }
   }
+
+  const fetchEventsWithFallback = useCallback(async () => {
+    try {
+      await Promise.all([fetchEvents(), fetchTrendingEvents()])
+    } catch (error) {
+      console.error('API calls failed, falling back to mock data:', error)
+      // Fallback to mock data
+      const transformedEvents = mockEvents.map(event => ({
+        id: event.id.toString(),
+        name: event.title,
+        category: event.category,
+        venue_name: event.location,
+        city: event.location.split(',')[0],
+        state: event.location.split(',')[1]?.trim() || '',
+        event_date: event.date,
+        image_url: event.image_url,
+        artist_lineup: [event.category],
+        ticket_count: event.ticket_count,
+        lowest_price: event.lowest_price
+      }))
+
+      setEvents(transformedEvents)
+      setTrendingEvents(transformedEvents.filter((_, index) => index < 3))
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    const useMockData = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' ||
+                       process.env.NODE_ENV === 'production' // Default to mock data in production
+
+    if (useMockData) {
+      // Use mock data for demo
+      const transformedEvents = mockEvents.map(event => ({
+        id: event.id.toString(),
+        name: event.title,
+        category: event.category,
+        venue_name: event.location,
+        city: event.location.split(',')[0],
+        state: event.location.split(',')[1]?.trim() || '',
+        event_date: event.date,
+        image_url: event.image_url,
+        artist_lineup: [event.category],
+        ticket_count: event.ticket_count,
+        lowest_price: event.lowest_price
+      }))
+
+      setEvents(transformedEvents)
+      setTrendingEvents(transformedEvents.filter((_, index) => index < 3))
+      setLoading(false)
+    } else {
+      // Try real API calls, fallback to mock data on failure
+      fetchEventsWithFallback()
+    }
+  }, [fetchEventsWithFallback])
+
 
   const filteredEvents = events.filter(event =>
     event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
