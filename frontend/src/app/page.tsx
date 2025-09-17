@@ -450,7 +450,7 @@ export default function Home() {
             <div className="md:col-span-1">
               <p className="text-white text-sm font-light italic leading-relaxed">
                 No more excuses,<br />
-                you're coming out<br />
+                you&apos;re coming out<br />
                 tonight.
               </p>
             </div>

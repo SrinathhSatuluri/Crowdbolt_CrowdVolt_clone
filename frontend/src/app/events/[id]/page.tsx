@@ -38,7 +38,6 @@ export default function EventDetailsPage() {
   const [ticketStats, setTicketStats] = useState<TicketStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [showAuthModal, setShowAuthModal] = useState(false)
-  const [activeTab, setActiveTab] = useState<'buy' | 'sell'>('buy')
   const [activeSection, setActiveSection] = useState<'tickets' | 'buyers' | null>(null)
 
   useEffect(() => {
@@ -78,7 +77,7 @@ export default function EventDetailsPage() {
         fetchTicketStats()
       }
     }
-  }, [params.id])
+  }, [params.id, router])
 
   const fetchEventDetails = async () => {
     try {
