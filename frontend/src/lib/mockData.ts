@@ -131,26 +131,3 @@ export const mockEvents = [
   }
 ];
 
-export const mockTickets = [
-  { id: 1, event_id: 1, section: "VIP", price: 220, seller: "musiclover23" },
-  { id: 2, event_id: 1, section: "General Admission", price: 85, seller: "raver_jane" },
-  { id: 3, event_id: 1, section: "VIP", price: 215, seller: "edmfan92" },
-  { id: 4, event_id: 1, section: "General Admission", price: 90, seller: "basshead_tom" },
-  { id: 5, event_id: 1, section: "Premium", price: 150, seller: "techno_sarah" }
-];
-
-export const mockBuyers = [
-  { id: 1, event_id: 1, max_price: 200, quantity: 2, buyer: "festival_goer" },
-  { id: 2, event_id: 1, max_price: 180, quantity: 1, buyer: "rave_queen" },
-  { id: 3, event_id: 1, max_price: 250, quantity: 4, buyer: "group_leader" },
-  { id: 4, event_id: 1, max_price: 120, quantity: 1, buyer: "student_raver" }
-];
-
-export const mockEventStats = {
-  last_sale_price: 195,
-  average_price: 152,
-  price_change_24h: 8.5,
-  total_sales: 247,
-  available_tickets: 15,
-  interested_buyers: 32
-};
