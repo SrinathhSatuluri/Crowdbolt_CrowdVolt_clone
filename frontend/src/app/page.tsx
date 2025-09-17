@@ -121,7 +121,8 @@ export default function Home() {
       // Try real API calls, fallback to mock data on failure
       fetchEventsWithFallback()
     }
-  }, [fetchEventsWithFallback])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
 
   const filteredEvents = events.filter(event =>
