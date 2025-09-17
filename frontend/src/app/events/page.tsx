@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 
 interface CrowdBoltEvent {
   id: string
@@ -108,9 +109,11 @@ export default function EventsPage() {
             <div key={event.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
               {/* Event Image */}
               <div className="relative h-48">
-                <img
+                <Image
                   src={event.image_url}
                   alt={event.name}
+                  width={400}
+                  height={192}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement

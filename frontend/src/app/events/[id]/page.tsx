@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Image from 'next/image'
 import AuthModal from '@/components/AuthModal'
 import { API_ENDPOINTS, apiCall } from '@/lib/api'
 import { mockEvents, mockEventStats } from '@/lib/mockData'
@@ -35,10 +36,26 @@ export default function EventDetailsPage() {
   const params = useParams()
   const router = useRouter()
   const [event, setEvent] = useState<EventDetails | null>(null)
-  const [ticketStats, setTicketStats] = useState<TicketStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [activeSection, setActiveSection] = useState<'tickets' | 'buyers' | null>(null)
+
+  const fetchEventDetails = useCallback(async () => {
+    try {
+      const response = await apiCall(API_ENDPOINTS.eventDetail(params.id as string))
+      if (response.ok) {
+        const data = await response.json()
+        setEvent(data)
+      } else {
+        router.push('/')
+      }
+    } catch (error) {
+      console.error('Failed to fetch event details:', error)
+      router.push('/')
+    } finally {
+      setLoading(false)
+    }
+  }, [params.id, router])
 
   useEffect(() => {
     if (params.id) {
@@ -66,7 +83,6 @@ export default function EventDetailsPage() {
             highest_price: mockEvent.highest_price
           }
           setEvent(transformedEvent)
-          setTicketStats(mockEventStats)
         } else {
           router.push('/')
         }
@@ -74,39 +90,11 @@ export default function EventDetailsPage() {
       } else {
         // Use real API calls
         fetchEventDetails()
-        fetchTicketStats()
       }
     }
-  }, [params.id, router])
+  }, [params.id, router, fetchEventDetails])
 
-  const fetchEventDetails = async () => {
-    try {
-      const response = await apiCall(API_ENDPOINTS.eventDetail(params.id as string))
-      if (response.ok) {
-        const data = await response.json()
-        setEvent(data)
-      } else {
-        router.push('/')
-      }
-    } catch (error) {
-      console.error('Failed to fetch event details:', error)
-      router.push('/')
-    } finally {
-      setLoading(false)
-    }
-  }
 
-  const fetchTicketStats = async () => {
-    try {
-      const response = await apiCall(API_ENDPOINTS.eventStats(params.id as string))
-      if (response.ok) {
-        const data = await response.json()
-        setTicketStats(data)
-      }
-    } catch (error) {
-      console.error('Failed to fetch ticket stats:', error)
-    }
-  }
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -209,9 +197,11 @@ export default function EventDetailsPage() {
           <div className="space-y-4">
             {/* Event Image */}
             <div className="relative rounded-xl overflow-hidden">
-              <img
+              <Image
                 src={event.image_url}
                 alt={event.name}
+                width={600}
+                height={256}
                 className="w-full h-64 object-cover"
               />
             </div>
@@ -324,9 +314,11 @@ export default function EventDetailsPage() {
                       ].map((seller, index) => (
                         <div key={index} className="flex items-center justify-between p-3 bg-black/20 rounded-lg">
                           <div className="flex items-center space-x-3">
-                            <img
+                            <Image
                               src={seller.avatar}
                               alt={seller.name}
+                              width={32}
+                              height={32}
                               className="w-8 h-8 rounded-full object-cover"
                             />
                             <div>
@@ -355,9 +347,11 @@ export default function EventDetailsPage() {
                       ].map((buyer, index) => (
                         <div key={index} className="flex items-center justify-between p-3 bg-black/20 rounded-lg">
                           <div className="flex items-center space-x-3">
-                            <img
+                            <Image
                               src={buyer.avatar}
                               alt={buyer.name}
+                              width={32}
+                              height={32}
                               className="w-8 h-8 rounded-full object-cover"
                             />
                             <div>

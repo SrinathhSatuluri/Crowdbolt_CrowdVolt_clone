@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import AuthModal from '@/components/AuthModal'
 import { API_ENDPOINTS, apiCall } from '@/lib/api'
 import { mockEvents } from '@/lib/mockData'
@@ -227,9 +228,11 @@ export default function Home() {
             <div className="flex-1 max-w-lg">
               <div className="relative h-80 rounded-xl overflow-hidden group cursor-pointer shadow-2xl hover:shadow-purple-500/20 transition-all duration-500">
                 {/* Background Image */}
-                <img
+                <Image
                   src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&w=800&q=80"
                   alt="CrowdBolt Instagram"
+                  width={800}
+                  height={320}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                   onError={handleImageError}
                 />
@@ -311,9 +314,11 @@ export default function Home() {
                 >
                   {/* Event Image */}
                   <div className="relative h-40">
-                    <img
+                    <Image
                       src={event.image_url}
                       alt={event.name}
+                      width={288}
+                      height={160}
                       className="w-full h-full object-cover"
                       onError={handleImageError}
                     />
@@ -397,9 +402,11 @@ export default function Home() {
                   className="rounded-xl overflow-hidden transition-all cursor-pointer hover:scale-105 duration-300"
                 >
                   <div className="relative h-40">
-                    <img
+                    <Image
                       src={event.image_url}
                       alt={event.name}
+                      width={288}
+                      height={160}
                       className="w-full h-full object-cover"
                       onError={handleImageError}
                     />
