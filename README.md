@@ -1,6 +1,6 @@
 # CrowdBolt CrowdVolt Clone
 
-A modern marketplace platform for buying and selling limited edition sneakers, streetwear, and collectibles.
+The clone for CrowdVolt, a modern marketplace for buying and selling Rave and EDM tickets.
 
 ## Architecture
 
