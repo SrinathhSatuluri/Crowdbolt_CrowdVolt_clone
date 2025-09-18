@@ -1,4 +1,4 @@
-# CrowdBolt StockX Clone
+# CrowdBolt CrowdVolt Clone
 
 A modern marketplace platform for buying and selling limited edition sneakers, streetwear, and collectibles.
 
