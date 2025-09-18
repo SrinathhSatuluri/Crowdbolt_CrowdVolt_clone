@@ -1,66 +1,82 @@
-# CrowdBolt StockX Clone
+# CrowdBolt - CrowdVolt Clone
 
-A modern marketplace platform for buying and selling limited edition sneakers, streetwear, and collectibles.
+A marketplace platform for buying and selling EDM and rave event tickets, built with a modern full-stack architecture.
 
-## 🏗️ Architecture
+## About
+CrowdBolt is an event ticket resale marketplace focused on electronic music events. Users can buy and sell tickets with role-based access control, featuring a responsive design and real-time event discovery.
 
-This is a monorepo containing:
-- **Frontend**: Next.js with TypeScript, TailwindCSS, Redux Toolkit
-- **Backend**: Django REST Framework with PostgreSQL
-- **Infrastructure**: Docker containerization
+## Architecture
+- **Frontend**: Next.js 15, TypeScript, TailwindCSS, Redux Toolkit
+- **Backend**: Django 5.2 REST Framework, SQLite (PostgreSQL ready)
+- **Authentication**: JWT with role-based access control
+- **Infrastructure**: Docker, Vercel deployment
 
-## 🚀 Quick Start
+## Features
+- **Role-based System**: Separate buyer and seller capabilities
+- **Event Discovery**: Real-time search and filtering
+- **Responsive Design**: Mobile-first interface with TailwindCSS
+- **Ticket Management**: Secure listing and purchasing workflow
+- **Authentication**: JWT-based user management
 
-### Prerequisites
+## Prerequisites
 - Node.js 18+
 - Python 3.11+
 - Docker & Docker Compose
-- PostgreSQL
 
-### Development Setup
+## Quick Start
 
-1. **Clone the repository**
-   ```bash
-   git clone <repo-url>
-   cd CrowdBolt_stockX_clone
-   ```
+### 1. Clone Repository
+```bash
+git clone <repo-url>
+cd CrowdBolt_stockX_clone
+```
 
-2. **Start with Docker (Recommended)**
-   ```bash
-   docker-compose up -d
-   ```
+### 2. Start with Docker (Recommended)
+```bash
+docker-compose up -d
+```
 
-3. **Or run services separately**
+### 3. Run Services Separately
 
-   **Frontend:**
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
+**Frontend**
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-   **Backend:**
-   ```bash
-   cd backend
-   python -m venv venv
-   source venv/bin/activate  # Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   python manage.py migrate
-   python manage.py runserver
-   ```
+**Backend**
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
 
-## 📚 Documentation
+## Access
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000/api/
+- **Admin Panel**: http://localhost:8000/admin/
 
-- [Development Guide](./CLAUDE.md) - Architecture and development practices
-- [API Documentation](http://localhost:8000/api/docs/) - Auto-generated API docs
+## Project Structure
+```
+CrowdBolt_stockX_clone/
+├── frontend/           # Next.js application
+├── backend/           # Django REST API
+│   ├── apps/
+│   │   ├── users/     # User management
+│   │   └── products/  # Event/ticket management
+├── docker-compose.yml
+└── README.md
+```
 
-## 🛠️ Tech Stack
-
-- **Frontend**: Next.js, React, TypeScript, TailwindCSS, Redux Toolkit
-- **Backend**: Django, Django REST Framework, PostgreSQL
-- **DevOps**: Docker, GitHub Actions
-- **Payments**: Stripe Connect
-
-## 📝 License
-
-This project is for educational purposes.
+## Development Status
+- User authentication system
+- Role-based access control
+- Responsive frontend interface
+- Event browsing and search
+- Ticket purchasing workflow (in progress)
+- Payment integration (in progress)
+- PostgreSQL migration (in progress)
