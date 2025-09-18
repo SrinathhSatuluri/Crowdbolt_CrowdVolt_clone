@@ -2,14 +2,14 @@
 
 A modern marketplace platform for buying and selling limited edition sneakers, streetwear, and collectibles.
 
-## 🏗️ Architecture
+## Architecture
 
 This is a monorepo containing:
 - **Frontend**: Next.js with TypeScript, TailwindCSS, Redux Toolkit
 - **Backend**: Django REST Framework with PostgreSQL
 - **Infrastructure**: Docker containerization
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js 18+
@@ -49,18 +49,13 @@ This is a monorepo containing:
    python manage.py runserver
    ```
 
-## 📚 Documentation
-
-- [Development Guide](./CLAUDE.md) - Architecture and development practices
-- [API Documentation](http://localhost:8000/api/docs/) - Auto-generated API docs
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend**: Next.js, React, TypeScript, TailwindCSS, Redux Toolkit
 - **Backend**: Django, Django REST Framework, PostgreSQL
 - **DevOps**: Docker, GitHub Actions
 - **Payments**: Stripe Connect
 
-## 📝 License
+## License
 
 This project is for educational purposes.
