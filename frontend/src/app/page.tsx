@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import AuthModal from '@/components/AuthModal'
@@ -36,8 +36,67 @@ export default function Home() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
 
+  const fetchEvents = async () => {
+    try {
+      const response = await apiCall(API_ENDPOINTS.events)
+      if (response.ok) {
+        const data: EventsResponse = await response.json()
+        setEvents(data.results)
+      } else {
+        throw new Error('Events API failed')
+      }
+    } catch (error) {
+      console.error('Failed to fetch events:', error)
+      throw error
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchTrendingEvents = async () => {
+    try {
+      const response = await apiCall(`${API_ENDPOINTS.trending}?limit=3`)
+      if (response.ok) {
+        const data = await response.json()
+        setTrendingEvents(data.trending_events)
+      } else {
+        throw new Error('Trending events API failed')
+      }
+    } catch (error) {
+      console.error('Failed to fetch trending events:', error)
+      throw error
+    }
+  }
+
+  const fetchEventsWithFallback = useCallback(async () => {
+    try {
+      await Promise.all([fetchEvents(), fetchTrendingEvents()])
+    } catch (error) {
+      console.error('API calls failed, falling back to mock data:', error)
+      // Fallback to mock data
+      const transformedEvents = mockEvents.map(event => ({
+        id: event.id.toString(),
+        name: event.title,
+        category: event.category,
+        venue_name: event.location,
+        city: event.location.split(',')[0],
+        state: event.location.split(',')[1]?.trim() || '',
+        event_date: event.date,
+        image_url: event.image_url,
+        artist_lineup: [event.category],
+        ticket_count: event.ticket_count,
+        lowest_price: event.lowest_price
+      }))
+
+      setEvents(transformedEvents)
+      setTrendingEvents(transformedEvents.filter((_, index) => index < 3))
+      setLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
-    const useMockData = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true'
+    const useMockData = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true' ||
+                       process.env.NODE_ENV === 'production' // Default to mock data in production
 
     if (useMockData) {
       // Use mock data for demo
@@ -59,37 +118,12 @@ export default function Home() {
       setTrendingEvents(transformedEvents.filter((_, index) => index < 3))
       setLoading(false)
     } else {
-      // Use real API calls
-      fetchEvents()
-      fetchTrendingEvents()
+      // Try real API calls, fallback to mock data on failure
+      fetchEventsWithFallback()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const fetchEvents = async () => {
-    try {
-      const response = await apiCall(API_ENDPOINTS.events)
-      if (response.ok) {
-        const data: EventsResponse = await response.json()
-        setEvents(data.results)
-      }
-    } catch (error) {
-      console.error('Failed to fetch events:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchTrendingEvents = async () => {
-    try {
-      const response = await apiCall(`${API_ENDPOINTS.trending}?limit=3`)
-      if (response.ok) {
-        const data = await response.json()
-        setTrendingEvents(data.trending_events)
-      }
-    } catch (error) {
-      console.error('Failed to fetch trending events:', error)
-    }
-  }
 
   const filteredEvents = events.filter(event =>
     event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
